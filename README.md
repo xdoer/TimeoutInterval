@@ -1,6 +1,6 @@
 # TimeoutInterval
 
-递归一个 setTimeout，来代替 n 个 setInterval
+递归一个 setTimeout，代替执行 n 个 setInterval
 
 ## 安装
 
