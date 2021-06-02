@@ -7,10 +7,10 @@ export class TimeoutInterval {
   private timerId: any
   private count = 0
   private instanceId = 0
+  private delay = 0
 
-  get delay() {
-    const base = this.cbs?.[0].interval || 0
-    return this.cbs.reduce((min, cur) => cur.interval < min ? cur.interval : min, base)
+  private initDelay() {
+    this.delay = this.cbs.reduce((min, cur) => cur.interval < min ? cur.interval : min, this.cbs?.[0].interval || 0)
   }
 
   private start() {
@@ -34,6 +34,8 @@ export class TimeoutInterval {
   add(cb: TimerCallBack, interval = 1000) {
     const id = this.instanceId++
     this.cbs.push({ cb, interval, id })
+
+    this.initDelay()
 
     if (!this.timerId) this.start()
 
