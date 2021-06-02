@@ -10,7 +10,11 @@ export class TimeoutInterval {
   private delay = 0
 
   private initDelay() {
-    this.delay = this.cbs.reduce((min, cur) => cur.interval < min ? cur.interval : min, this.cbs?.[0].interval || 0)
+    /**
+     * 由于使用了 `setTimeout` 递归，当第一个注册的 cb interval 比后面注册的 interval 大时，会造成后面执行的时间有误差。
+     * 这里做了取舍，队列中注册的时间大于 1000ms，会默认使用 1000ms 进行递归
+     */
+    this.delay = this.cbs.reduce((min, cur) => cur.interval < min ? cur.interval : min, 1000)
   }
 
   private start() {
