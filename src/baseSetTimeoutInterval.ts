@@ -1,6 +1,7 @@
-export type CallBack = (timerId: NodeJS.Timeout) => any
+export type CallBack = () => any
+export type TimerIdCallBack = (timerId: any) => any
 
-export function baseSetTimeoutInterval(cb: CallBack, interval = 1000) {
+export function baseSetTimeoutInterval(cb: CallBack, interval = 1000, getTimerId: TimerIdCallBack) {
   const now = Date.now()
   let count = 0
   let timerId: any = null
@@ -12,9 +13,10 @@ export function baseSetTimeoutInterval(cb: CallBack, interval = 1000) {
 
     timerId = setTimeout(() => {
       countdown()
+      cb()
     }, nextTime)
 
-    cb(timerId)
+    getTimerId(timerId)
   }
 
   countdown()

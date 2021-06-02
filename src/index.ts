@@ -18,16 +18,21 @@ export class TimeoutInterval {
   }
 
   private start() {
-    baseSetTimeoutInterval((timerId) => {
-      this.timerId = timerId
-      for (let i = 0; i < this.cbs.length; i++) {
-        const { cb, interval } = this.cbs[i]
-        if (!(this.count * this.delay % interval)) {
-          cb()
+    baseSetTimeoutInterval(
+      () => {
+        for (let i = 0; i < this.cbs.length; i++) {
+          const { cb, interval } = this.cbs[i]
+          if (!(this.count * this.delay % interval)) {
+            cb()
+          }
         }
+        this.count++
+      },
+      this.delay,
+      (timerId) => {
+        this.timerId = timerId
       }
-      this.count++
-    }, this.delay)
+    )
   }
 
   private stop() {
@@ -36,7 +41,7 @@ export class TimeoutInterval {
   }
 
   add(cb: TimerCallBack, interval = 1000) {
-    const id = this.instanceId++
+    const id = ++this.instanceId
     this.cbs.push({ cb, interval, id })
 
     this.initDelay()
