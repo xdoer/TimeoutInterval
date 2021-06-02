@@ -27,6 +27,8 @@ clearTimeoutInterval(timerId);
 
 **_注意:与原生 setInterval 的区别在于，setTimeoutInterval 注册的回调函数先回立即执行一次，接着再间隔执行_**
 
+查阅文章: [写个倒计时？](https://aiyou.life/post/iWhkaOqqO/)
+
 ## 原理
 
 ### 批量执行回调
