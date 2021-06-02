@@ -25,8 +25,6 @@ clearTimeoutInterval(timerId);
 > - 计时准确。使用 setTimeout 递归，及时修正计时误差。
 > - 单一递归实例。无论调用多少次 `setTimeoutInterval` API，内部只会进行一个计时器，然后在所有注册的时间，执行回调函数
 
-**_注意:与原生 setInterval 的区别在于，setTimeoutInterval 注册的回调函数先回立即执行一次，接着再间隔执行_**
-
 查阅文章: [写个倒计时？](https://aiyou.life/post/iWhkaOqqO/)
 
 ## 原理
