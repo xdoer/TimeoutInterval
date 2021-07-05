@@ -33,7 +33,7 @@ export class TimeoutController {
 
     const instance = new TimeoutInterval(interval)
 
-    this.tasksMap.set(interval, tasks.concat(instance))
+    this.tasksMap.set(interval, (this.tasksMap.get(interval) || []).concat(instance))
 
     return instance.add(cb)
   }
@@ -41,7 +41,16 @@ export class TimeoutController {
   remove(id: number) {
     const timeoutInstancesLength = this.timeoutInstances.length
     for (let i = 0; i < timeoutInstancesLength; i++) {
-      if (this.timeoutInstances[i].remove(id)) {
+      const instance = this.timeoutInstances[i]
+      if (instance.remove(id)) {
+        // 如果这个实例中没有了任务，则需要从 tasksMap 中将其删掉
+        if (!instance.cbs.length) {
+          const tasks = this.tasksMap.get(instance.delay) || []
+          const idx = tasks.findIndex(task => task === instance)
+          if (idx !== -1) {
+            tasks.splice(idx, 1)
+          }
+        }
         break
       }
     }
@@ -51,6 +60,7 @@ export class TimeoutController {
     const timeoutInstancesLength = this.timeoutInstances.length
     for (let i = 0; i < timeoutInstancesLength; i++) {
       this.timeoutInstances[i].removeAll()
+      this.tasksMap.clear()
     }
   }
 }

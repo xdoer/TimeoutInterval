@@ -8,7 +8,7 @@ export class TimeoutInterval {
   static instanceId = 0
   now = 0
 
-  constructor(private delay = 0) { }
+  constructor(public delay = 0) { }
 
   private start() {
     this.now = Date.now()
