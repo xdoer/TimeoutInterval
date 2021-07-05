@@ -5,23 +5,19 @@ export class TimeoutInterval {
   cbs: TimerCallBackMeta[] = []
 
   private timerId: any
-  private count = 0
   static instanceId = 0
-  delay = 0
   now = 0
+
+  constructor(private delay = 0) { }
 
   private start() {
     this.now = Date.now()
     baseSetTimeoutInterval(
       () => {
         for (let i = 0; i < this.cbs.length; i++) {
-          const { cb, interval } = this.cbs[i]
-          if (!(this.count * this.delay % interval)) {
-            this.now = Date.now()
-            cb()
-          }
+          this.now = Date.now()
+          this.cbs[i].cb()
         }
-        this.count++
       },
       this.delay,
       (timerId) => {
@@ -35,14 +31,11 @@ export class TimeoutInterval {
     this.timerId = null
   }
 
-  add(cb: TimerCallBack, interval = 1000) {
+  add(cb: TimerCallBack) {
     const id = ++TimeoutInterval.instanceId
-    this.cbs.push({ cb, interval, id })
+    this.cbs.push({ cb, id })
 
-    if (!this.timerId) {
-      this.delay = interval
-      this.start()
-    }
+    if (!this.timerId) this.start()
 
     return id
   }

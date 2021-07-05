@@ -4,6 +4,8 @@ import { TimerCallBack } from './types'
 export class TimeoutController {
   private tasksMap = new Map<number, TimeoutInterval[]>()
 
+  constructor(private offset = 500) { }
+
   get tasks() {
     return Array.from(this.tasksMap)
   }
@@ -12,37 +14,28 @@ export class TimeoutController {
     return this.tasks.reduce((t, [_, list]) => t = t.concat(list), [] as TimeoutInterval[])
   }
 
-  static offset = 500
-
   add(cb: TimerCallBack, interval = 1000): number {
 
-    /**
-     * 1、查找 interval 能整除的任务，能整除说明要加的 cb 都可以添加进去
-     * 2、将能整除的的计时器提取出来
-     * 3、找出最小的偏移量
-     */
-    let now = Date.now()
-    const mayCanInsert = this.tasks.filter(([id]) => !(interval % id))
-    const tasks = mayCanInsert.reduce((t, [_, list]) => t = t.concat(list), [] as TimeoutInterval[]).sort((a, b) => (now - a.now) - (now - b.now))
+    // 找到对应的任务列表
+    const tasks = this.tasksMap.get(interval) || []
 
-    if (tasks.length) {
+    // 列表中，比较 now
+    const now = Date.now()
+    const sortTasks = tasks.filter(task => now - task.now < this.offset).sort((a, b) => (now - a.now) - (now - b.now))
+
+    if (sortTasks.length) {
       const miniOffset = now - tasks[0].now
-      // 最小偏移量可以接受，则直接添加任务
-      if (miniOffset < TimeoutController.offset) {
-        return tasks[0].add(cb, interval)
+      // 可以接受最小偏移量，则直接添加任务
+      if (miniOffset < this.offset) {
+        return tasks[0].add(cb)
       }
     }
 
-    const instance = new TimeoutInterval()
+    const instance = new TimeoutInterval(interval)
 
-    /**
-     * 先尝试查到能整除的队列中
-     * 不能整除，再新建
-     */
-    const id = mayCanInsert[0]?.[0] ?? interval
-    this.tasksMap.set(id, (this.tasksMap.get(id) || []).concat(instance))
+    this.tasksMap.set(interval, tasks.concat(instance))
 
-    return instance.add(cb, interval)
+    return instance.add(cb)
   }
 
   remove(id: number) {
