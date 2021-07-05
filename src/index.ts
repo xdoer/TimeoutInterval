@@ -21,22 +21,11 @@ export class TimeoutController {
 
     // 列表中，比较 now
     const now = Date.now()
-    const sortTasks = tasks.filter(task => now - task.now < this.offset).sort((a, b) => (now - a.now) - (now - b.now))
+    const sortTasks = tasks.sort((a, b) => (now - a.now) - (now - b.now))
 
-    if (sortTasks.length) {
-      // const miniOffset = now - tasks[0].now
-      // // 可以接受最小偏移量，则直接添加任务
-      // if (miniOffset < this.offset) {
-      //   return tasks[0].add(cb)
-      // }
-
-      for (let i = 0; i < tasks.length; i++) {
-        const offset = now - tasks[i].now
-        if (offset <= this.offset) return tasks[i].add(cb)
-
-        // TODO: 分组
-
-      }
+    for (let i = 0; i < sortTasks.length; i++) {
+      const offset = now - sortTasks[i].now
+      if (offset <= this.offset) return sortTasks[i].add(cb)
     }
 
     const instance = new TimeoutInterval(interval)
