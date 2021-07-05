@@ -1,6 +1,6 @@
 # TimeoutInterval
 
-合并计时器实例，提高应用性能
+合并计数器实例，提高应用性能
 
 ## 安装
 
@@ -24,43 +24,41 @@ const timerId = setTimeoutInterval(() => {
 clearTimeoutInterval(timerId);
 ```
 
-### 合并计时器实例
+### 合并计数器实例
 
 默认合并计时误差在 500ms，也就是说在下一个计时间隔执行的 500ms 内，通过 `setTimeoutInterval` 插入任意数量的回调函数，都会共用一个计时实例。
 
-下面的五个计时器中，前三个会合并为一个计时器实例，后两个会分别产生一个计时器实例[TODO: 这里似乎可以合并为一个计时器实例]。
+下面的四个计数器中，timer1、timer2、timer4 会共用一个实例，timer3 会用一个实例。
 
 ```ts
 import { setTimeoutInterval, clearTimeoutInterval } from '@xdoer/timeout-interval';
 
-setTimeoutInterval(() => {
+const timer1 = setTimeoutInterval(() => {
   console.log('1');
 }, 1000);
 
-await sleep(300);
+await sleep(100);
 
-setTimeoutInterval(() => {
+const timer2 = setTimeoutInterval(() => {
   console.log('2');
 }, 1000);
 
-await sleep(1200);
+await sleep(500);
 
-setTimeoutInterval(() => {
+const timer3 = setTimeoutInterval(() => {
   console.log('3');
 }, 1000);
 
-await sleep(10501);
+await sleep(600);
 
-setTimeoutInterval(() => {
+const timer4 = setTimeoutInterval(() => {
   console.log('4');
 }, 1000);
-
-await sleep(10502);
-
-setTimeoutInterval(() => {
-  console.log('5');
-}, 1000);
 ```
+
+**_对于计时间隔 interval， 如果误差为 offset，则最多会产生 interval / offset 个计时实例_**
+
+上面的例子中，timer1 注册了一个回调函数，计数器实例 A 开始执行，过了 100ms，timer2 开始注册回调函数，此时，计数器 A 已经执行了 100ms，检查计时误差有 500ms，因而可以直接将 timer2 的回调函数插入到计数器 A。又过了 500ms，timer3 开始注册回调函数，此时，距离计数器 A 执行已经过了 600ms，大于计时误差 500ms，因而只能新建计数器实例 B，并将 timer3 回调函数插入。又过了 600ms, timer4 注册回调函数， 此时距离计时器 A 开始执行过了 1200ms，由于每过 1000ms，开始一个计时循环，因而 1200ms 与 200ms 等效，200ms 在 500ms 的计时误差内，因而可以直接将 timer4 的回调函数插入到计数器实例 A 中。所以总共产生了两个计数器实例，相比传统的 setInterval, 大大提高了性能。
 
 ### 自定义计时误差
 
@@ -77,7 +75,7 @@ const timerId = timeoutInterval.add(() => {
   console.log(1);
 }, 1000);
 
-// 通过 clear 方法停止计时器
+// 通过 clear 方法停止计数器
 timeoutInterval.remove(timerId);
 ```
 
@@ -95,7 +93,7 @@ export const clearTimeoutInterval = timeoutInterval.remove.bind(timeoutInterval)
 
 ## 特点
 
-> - 计时准确。使用 setTimeout 递归，及时修正计时误差。
+> - 计时准确。使用 setTimeout 递归，及时修正计时误差。【首次执行，会有小于 offset 的计时误差】
 > - 合并递归计时实例。在误差允许的范围内。会合并递归执行的实例，减少系统消耗
 
 查阅文章: [写个倒计时？](https://aiyou.life/post/iWhkaOqqO/)
@@ -111,7 +109,7 @@ setInterval(() => {
 }, interval);
 ```
 
-在 callback 处，可以循环调用注册在计时器中的函数
+在 callback 处，可以循环调用注册在计数器中的函数
 
 ### 偏移纠正
 
