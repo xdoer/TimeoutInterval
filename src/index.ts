@@ -1,8 +1,6 @@
 import { TimeoutInterval } from './TimeoutInterval'
 import { TimerCallBack } from './types'
 
-export { baseSetTimeoutInterval } from './baseSetTimeoutInterval'
-
 export class TimeoutController {
   private tasksMap = new Map<number, TimeoutInterval[]>()
 
@@ -41,7 +39,8 @@ export class TimeoutController {
      * 先尝试查到能整除的队列中
      * 不能整除，再新建
      */
-    this.tasksMap.set(mayCanInsert[0]?.[0] ?? interval, (this.tasksMap.get(interval) || []).concat(instance))
+    const id = mayCanInsert[0]?.[0] ?? interval
+    this.tasksMap.set(id, (this.tasksMap.get(id) || []).concat(instance))
 
     return instance.add(cb, interval)
   }
@@ -63,8 +62,10 @@ export class TimeoutController {
   }
 }
 
-const timeoutInterval = new TimeoutController()
+export const timeoutInterval = new TimeoutController()
 
 export const setTimeoutInterval = timeoutInterval.add.bind(timeoutInterval)
 
 export const clearTimeoutInterval = timeoutInterval.remove.bind(timeoutInterval)
+
+export { baseSetTimeoutInterval } from './baseSetTimeoutInterval'

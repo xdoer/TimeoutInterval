@@ -1,6 +1,6 @@
 # TimeoutInterval
 
-递归一个 setTimeout，代替执行 n 个 setInterval
+合并 n 个 setInterval，提高应用性能
 
 ## 安装
 
@@ -23,9 +23,19 @@ clearTimeoutInterval(timerId);
 ## 特点
 
 > - 计时准确。使用 setTimeout 递归，及时修正计时误差。
-> - 单一递归实例。无论调用多少次 `setTimeoutInterval` API，内部只会进行一个计时器，然后在所有注册的时间，执行回调函数
+> - 合并递归实例。在误差允许的范围内。会合并递归执行的实例，减少系统消耗
 
 查阅文章: [写个倒计时？](https://aiyou.life/post/iWhkaOqqO/)
+
+## 配置
+
+默认会将偏移时间在 500ms 内的计时器进行合并
+
+```ts
+import { TimeoutController } from '@xdoer/timeout-interval';
+
+TimeoutController.offset = 500;
+```
 
 ## 原理
 
