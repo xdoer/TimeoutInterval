@@ -26,9 +26,9 @@ clearTimeoutInterval(timerId);
 
 ### 合并计数器实例
 
-默认合并计时误差在 500ms，也就是说在计时间隔执行的 500ms 内，通过 `setTimeoutInterval` 插入任意数量的回调函数，都会共用一个计数实例。
+默认合并计时误差在 500ms，也就是说在计时间隔的每一个 500ms，通过 `setTimeoutInterval` 插入任意数量的回调函数，都会共用一个计数实例。
 
-下面的四个计数器中，timer1、timer2、timer4 会共用一个底层的 `setInterval` 实例，timer3 会用一个底层的 `setInterval` 实例。
+下面的四个计数器中，timer1、timer2、timer4 会共用一个底层的 `setInterval` 实例，timer3 会用一个底层的 `setInterval` 实例。这里为了方便描述，使用 setInterval 代替底层递归的 setTimeout
 
 ```ts
 import { setTimeoutInterval, clearTimeoutInterval } from '@xdoer/timeout-interval';
