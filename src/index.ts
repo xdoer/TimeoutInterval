@@ -56,8 +56,8 @@ export class TimeoutController {
     const timeoutInstancesLength = this.timeoutInstances.length
     for (let i = 0; i < timeoutInstancesLength; i++) {
       this.timeoutInstances[i].removeAll()
-      this.tasksMap.clear()
     }
+    this.tasksMap.clear()
   }
 }
 
