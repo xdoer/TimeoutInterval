@@ -14,15 +14,11 @@ export class TimeoutInterval {
     this.now = Date.now()
     baseSetTimeoutInterval(
       () => {
-        for (let i = 0; i < this.cbs.length; i++) {
-          this.now = Date.now()
-          this.cbs[i].cb()
-        }
+        this.now = Date.now()
+        this.cbs.forEach(({ cb }) => cb())
       },
       this.delay,
-      (timerId) => {
-        this.timerId = timerId
-      }
+      timerId => this.timerId = timerId
     )
   }
 
@@ -55,7 +51,7 @@ export class TimeoutInterval {
   }
 
   removeAll() {
-    this.cbs = []
     this.stop()
+    this.cbs = []
   }
 }
