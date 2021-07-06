@@ -36,10 +36,13 @@ export class TimeoutController {
       if (offset > this.offset * i && offset < (this.offset * (i + 1))) return sortTasks[i].add(cb)
     }
 
-    // 找到第一个 now 为 0 的
-    const target = tasks.find(task => !task.now)
+    /**
+     * 当 interval > offset, 在这里一定会找到值为 0 的 now
+     * 当 interval < offset, 只有一个实例，所以会取值 task[0]
+     */
+    const target = tasks.find(task => !task.now) || tasks[0]
 
-    return target!.add(cb)
+    return target.add(cb)
   }
 
   remove(id: number) {
