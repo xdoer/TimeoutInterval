@@ -19,7 +19,7 @@ npm -i @xdoer/timeout-interval
 
 ### 基本使用
 
-你可以像常规的 `setInterval` 和 `clearInterval` 一样使用。
+你可以像常规的 `setInterval` 和 `clearInterval` 一样使用。两次调用 `setTimeoutInterval` 的间隔在 500ms 的整数倍内，会合并计数器。
 
 ```ts
 import { setTimeoutInterval, clearTimeoutInterval } from '@xdoer/timeout-interval';
@@ -29,6 +29,27 @@ const timerId = setTimeoutInterval(() => {
 }, 1000);
 
 clearTimeoutInterval(timerId);
+```
+
+上面的例子中，多次调用 `setTimeoutInterval` 的间隔在 500ms 的整数倍内，会合并计数器，也就是说，除了第一次的 `setTimeoutInterval` 调用，之后的调用，首次执行回调，最大会有 500ms 的计时误差。
+
+如果你需要准确的计时器，你可以使用 `baseSetTimeoutInterval` API
+
+```ts
+import { baseSetTimeoutInterval } from '@xdoer/timeout-interval';
+
+let timerId;
+
+baseSetTimeoutInterval(
+  () => {
+    console.log('1');
+  },
+  1000,
+  id => (timerId = id)
+);
+
+// 使用 clearTimeout 停止计时
+clearTimeout(id);
 ```
 
 ### 高级使用
@@ -60,6 +81,32 @@ const timeoutInterval = new TimeoutController(1000);
 export const setTimeoutInterval = timeoutInterval.add.bind(timeoutInterval);
 
 export const clearTimeoutInterval = timeoutInterval.remove.bind(timeoutInterval);
+```
+
+## 调试
+
+### 数据结构
+
+包默认导出了一个 `timeoutInterval` 对象，它是一个 `TimeoutController` 实例 你可以打印一下，观察其数据结构.
+
+```ts
+import { timeoutInterval } from '@xdoer/timeout-interval';
+
+console.log(timeoutInterval);
+```
+
+### 计时实例
+
+可以通过代理劫持的方式，观察计时实例
+
+```ts
+window.setTimeout = new Proxy(window.setTimeout, {
+  apply: (...args) => {
+    const timerId = Reflect.apply(...args)
+    console.log('setTimeout', timerId, args[2][1])
+    return timerId
+  }
+}
 ```
 
 ## 原理
