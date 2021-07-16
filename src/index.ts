@@ -6,11 +6,11 @@ export class TimeoutController {
 
   constructor(private offset = 500) { }
 
-  get tasks() {
+  private get tasks() {
     return Array.from(this.tasksMap)
   }
 
-  get timeoutInstances() {
+  private get timeoutInstances() {
     return this.tasks.reduce((t, [_, list]) => t = t.concat(list), [] as TimeoutInterval[])
   }
 
@@ -33,7 +33,7 @@ export class TimeoutController {
     for (let i = 0; i < taskLength; i++) {
       const taskNow = sortTasks[i].now
       const offset = now - taskNow
-      if (offset > this.offset * i && offset < (this.offset * (i + 1))) return sortTasks[i].add(cb)
+      if ((offset >= this.offset * i) && (offset < (this.offset * (i + 1)))) return sortTasks[i].add(cb)
     }
 
     /**
