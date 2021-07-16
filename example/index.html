@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script type="module">
+      import {
+        setTimeoutInterval,
+        clearTimeoutInterval,
+        timeoutInterval,
+      } from '../dist/timeout-interval.esm.js';
+
+      window.setTimeout = new Proxy(window.setTimeout, {
+        apply: (...args) => {
+          const timerId = Reflect.apply(...args);
+          console.log('setTimeout', timerId, args[2][1]);
+          return timerId;
+        },
+      });
+
+      async function start() {
+        setTimeoutInterval(() => {
+          console.log('哈哈哈哈');
+        }, 1000);
+
+        // await sleep(550);
+
+        setTimeoutInterval(() => {
+          console.log('哈哈哈哈2');
+        }, 1000);
+
+        console.log('查看值', timeoutInterval.tasksMap.get(1000));
+      }
+
+      start();
+
+      function sleep(t) {
+        return new Promise(resolve => {
+          setTimeout(resolve, t);
+        });
+      }
+    </script>
+  </body>
+</html>
